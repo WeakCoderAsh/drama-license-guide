@@ -709,9 +709,61 @@
       .grow-first svg { flex: none; }
       .grow-first p { margin: 0; }
 
+      /* ============================================================
+         BEAUTIFUL CARDS LAYER — soft tints, shine sweep, gentle depth
+         ============================================================ */
+      .card {
+        border-radius: 20px;
+        background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+        box-shadow: 0 1px 2px rgba(6, 47, 110, .06), 0 18px 38px -22px rgba(22, 11, 51, .45);
+      }
+      .card::before { opacity: 1; height: 4px; }
+      .card h3 { letter-spacing: -0.01em; }
+      .badge { border-radius: 8px; padding: 6px 11px; }
+      .course-card {
+        border-radius: 22px;
+        background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+      }
+      .course-card:nth-child(1) { background: linear-gradient(180deg, #f0fdfa 0%, var(--surface) 55%); }
+      .course-card:nth-child(2) { background: linear-gradient(180deg, #f5f3ff 0%, var(--surface) 55%); }
+      .course-card.featured { background: linear-gradient(180deg, #fffbeb 0%, var(--surface) 55%); }
+      @media (prefers-color-scheme: dark) {
+        .course-card:nth-child(1) { background: linear-gradient(180deg, #062e29 0%, var(--surface) 60%); }
+        .course-card:nth-child(2) { background: linear-gradient(180deg, #1e1b4b 0%, var(--surface) 60%); }
+        .course-card.featured { background: linear-gradient(180deg, #2e2410 0%, var(--surface) 60%); }
+      }
+      .course-card::after, .card::after {
+        content: ""; position: absolute; top: 0; left: -80%; width: 60%; height: 100%;
+        background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .35), transparent);
+        transform: skewX(-18deg); transition: left .6s ease; pointer-events: none;
+      }
+      .course-card:hover::after, .card:hover::after { left: 130%; }
+      .course-step {
+        background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+        border-radius: 22px;
+      }
+      .pp-item {
+        border-radius: 18px;
+        background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+        transition: transform .22s var(--ease), box-shadow .22s ease;
+      }
+      .pp-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+      @media (prefers-reduced-motion: reduce) { .course-card::after, .card::after { display: none; } }
+
     </style>
   </head>
   <body>
+    <div id="pw-gate" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,#160b33,#3b1470 55%,#0b5fd7);padding:20px;">
+      <div style="background:#fff;border-radius:20px;padding:36px 32px;max-width:380px;width:100%;text-align:center;box-shadow:0 30px 60px -20px rgba(0,0,0,.6);">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.2em;color:#0b5fd7;">ASLI KAMAI</div>
+        <h2 style="font-family:Sora,sans-serif;font-size:22px;color:#0b1e3a;margin:10px 0 6px;">Enter Access Code</h2>
+        <p style="font-size:14px;color:#33507c;margin:0 0 18px;">Copy the code from the PDF and paste it here to unlock everything.</p>
+        <input id="pw-input" type="text" placeholder="Paste code here" autocomplete="off" style="width:100%;padding:13px 14px;font-size:16px;border:1.5px solid #a9c2e4;border-radius:12px;outline:none;box-sizing:border-box;">
+        <p style="font-size:13px;color:#6b83a8;margin:10px 0 0;">Hint: Short Drama King</p>
+        <button id="pw-btn" style="width:100%;margin-top:14px;padding:14px;border:none;border-radius:12px;background:linear-gradient(140deg,#e11d63,#7c3aed 55%,#0b5fd7);color:#fff;font-size:16px;font-weight:700;cursor:pointer;">Unlock</button>
+        <p id="pw-err" style="display:none;color:#b91c1c;font-size:13px;margin:10px 0 0;">Wrong code. Try again.</p>
+      </div>
+    </div>
     
     <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
     <header class="brandbar">
@@ -2068,6 +2120,28 @@
             if (s) navObs.observe(s);
           });
         }
+      })();
+    </script>
+    <script>
+      (function () {
+        var gate = document.getElementById('pw-gate');
+        try { if (sessionStorage.getItem('asli_unlocked') === '1') { gate.remove(); return; } } catch (e) {}
+        document.body.style.overflow = 'hidden';
+        function unlock() {
+          var v = document.getElementById('pw-input').value.trim();
+          if (v === 'SHORTDRAMAKING') {
+            try { sessionStorage.setItem('asli_unlocked', '1'); } catch (e) {}
+            gate.remove();
+            document.body.style.overflow = '';
+          } else {
+            document.getElementById('pw-err').style.display = 'block';
+            document.getElementById('pw-input').value = '';
+            document.getElementById('pw-input').focus();
+          }
+        }
+        document.getElementById('pw-btn').addEventListener('click', unlock);
+        document.getElementById('pw-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') unlock(); });
+        document.getElementById('pw-input').focus();
       })();
     </script>
   </body>
